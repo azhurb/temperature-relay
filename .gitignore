@@ -3,7 +3,8 @@
 *.elf
 /temp_relay.hex
 /temp_relay.lss
-/temp_relay.lst
+/*.lst
 /temp_relay.map
-/temp_relay.o
+/*.o
 /temp_relay.sym
+/Last Loaded temp_relay.DBK
