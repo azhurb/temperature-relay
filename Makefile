@@ -60,7 +60,7 @@ TARGET = temp_relay
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c
+SRC = $(TARGET).c ds18x20.c onewire.c delay.c
 
 
 # List Assembler source files here.
