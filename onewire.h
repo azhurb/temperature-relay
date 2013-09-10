@@ -12,7 +12,7 @@
 #define MAXDEVICES 8
 
 // Если для эмуляции шины используется USART
-//#define UART_AS_OneWire
+#define UART_AS_OneWire
 
 // Если для эмуляции 1-wire не спольльзуется USART, но используется 2 пина (вход и выход)
 #define OW_TWO_PINS
@@ -23,9 +23,9 @@
 	#define USART_BAUDRATE_9600 (((F_CPU / (9600 * 16UL))) - 1)
 #else
 	#include <util/delay.h>
-	#define OW_DDR DDRC
-	#define OW_PORT PORTC
-	#define OW_PIN PINC
+	#define OW_DDR DDRB
+	#define OW_PORT PORTB
+	#define OW_PIN PINB
 	#ifndef OW_TWO_PINS //если используется один пин, укажите его номер
 		#define OW_BIT 0
 	#else // если используются 2 пина, укажите их номера

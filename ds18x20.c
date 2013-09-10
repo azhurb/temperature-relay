@@ -77,7 +77,7 @@ char DS18x20_ReadData(unsigned char *rom, unsigned char *buffer)
 
 void DS18x20_ConvertToThemperature(unsigned char* data, unsigned char* themp)
 {
-	/*//Store temperature integer digits and decimal digits
+	//Store temperature integer digits and decimal digits
 	themp[1] = data[0]>>4;
 	themp[1] |= (data[1]&0x07)<<4;
 	//Store decimal digits
@@ -87,22 +87,6 @@ void DS18x20_ConvertToThemperature(unsigned char* data, unsigned char* themp)
 		themp[1] = 127-themp[1];
 		themp[0] = '-';
 	} 
-	else if((data[0]==0x00)&&(data[1]==0x00)) themp[0] = ' '; else themp[0] = '+';	*/
-	themp[1] = data[0];
-	themp[2] = data[1];
-	int TReading = (themp[2] << 8) + themp[1];
-	int SignBit = TReading & 0x8000;
-	if (SignBit) // negative
-	{
-		TReading = (TReading ^ 0xffff) + 1; // 2's comp
-	}
-	
-	int Tc_100 = (6 * TReading) + TReading / 4;
-	int Whole = Tc_100 / 100;
-	int Fract = Tc_100 % 100;
-	
-	themp[0] = SignBit;
-	themp[1] = Whole;
-	themp[2] = Fract;
+	else if((data[0]==0x00)&&(data[1]==0x00)) themp[0] = ' '; else themp[0] = '+';	
 }
 

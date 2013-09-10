@@ -16,18 +16,18 @@ volatile int display1 = 0;
 // Обработчик прерывания по переполнению таймера2
 ISR (TIMER2_OVF_vect)
 {    
-	PORTD = 0x00; //гасим все разряды
-	DDRB  = (1 << segcounter); //выбираем следующий разряд
+	PORTB = 0x00; //гасим все разряды
+	DDRC  = (1 << segcounter); //выбираем следующий разряд
 	switch (segcounter)
 	{     
 		case 0:
-			PORTD = SEGMENT[display1 % 1000 / 100]; // здесь раскладываем число на разряды
+			PORTB = SEGMENT[display1 % 1000 / 100]; // здесь раскладываем число на разряды
 			break;
 		case 1:
-			PORTD = SEGMENT[display1 % 100 / 10] | 0x80;
+			PORTB = SEGMENT[display1 % 100 / 10] | 0x80;
 			break;    
 		case 2:
-			PORTD = SEGMENT[display1 % 10];
+			PORTB = SEGMENT[display1 % 10];
 			break;
 	}
 	if ((segcounter++) > 1) segcounter = 0;    
@@ -64,12 +64,12 @@ unsigned char search_ow_devices(void) // поиск всех устройств на шине
 /***Главная функция***/
 int main (void) 
 {
-	DDRD |= (1 << PD6)|(1 << PD5)|(1 << PD4)|(1 << PD3)|(1 << PD2)|(1 << PD1)|(1 << PD0);
-	DDRB |= (1 << PB2)|(1 << PB1)|(1 << PB0);
-	PORTD = 0x00;
-	PORTB = 0x00;    
+	DDRB |= (1 << PD6)|(1 << PD5)|(1 << PD4)|(1 << PD3)|(1 << PD2)|(1 << PD1)|(1 << PD0);
+	DDRC |= (1 << PB3)|(1 << PB2)|(1 << PB1)|(1 << PB0);
+	PORTB = 0x00;
+	PORTC = 0x00;    
 	
-	DDRC = 0b00000010; PORTC = 0b00000000;
+	DDRD = 0b00000010; PORTD = 0b00000000;
 	
 	TIMSK |= (1 << TOIE2); // разрешение прерывания по таймеру2
 	TCCR2 |= (1 << CS21); //предделитель на 8 
@@ -86,6 +86,8 @@ int main (void)
 	unsigned char	data[2]; // переменная для хранения старшего и младшего байта данных
 	char readResult;
 	unsigned char	themperature[3]; // в этот массив будет записана температура
+	
+	PORTC |= 0b00001000;
 	
 	while(1)
 	{
@@ -105,7 +107,7 @@ int main (void)
 					if (readResult == 1){
 						DS18x20_ConvertToThemperature(data, themperature); // преобразовываем температуру в человекопонятный вид
 						
-						display1 = themperature[1];
+						display1 = themperature[1]*10 + themperature[2]/10;
 					}
 					
 				} break;

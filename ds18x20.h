@@ -16,7 +16,7 @@
 /* constants */
 #define THERM_DECIMAL_STEPS_12BIT 625 //.0625
 
-//#define DS18X20_CHECK_CRC
+#define DS18X20_CHECK_CRC
 
 char DS18x20_StartMeasure(void);
 char DS18x20_StartMeasureAddressed(unsigned char* rom);
