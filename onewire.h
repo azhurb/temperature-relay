@@ -18,9 +18,9 @@
 #define OW_TWO_PINS
 
 #ifdef UART_AS_OneWire
-	#define USART_BAUDRATE_57600 (((F_CPU / (57600 * 16UL))) - 1)
-	#define USART_BAUDRATE_115200 (((F_CPU / (115200 * 16UL))) - 1)
-	#define USART_BAUDRATE_9600 (((F_CPU / (9600 * 16UL))) - 1)
+	#define USART_BAUDRATE_57600 (((F_CPU / (57600 * 8UL))) - 1)
+	#define USART_BAUDRATE_115200 (((F_CPU / (115200 * 8UL))) - 1)
+	#define USART_BAUDRATE_9600 (((F_CPU / (9600 * 8UL))) - 1)
 #else
 	#include <util/delay.h>
 	#define OW_DDR DDRB

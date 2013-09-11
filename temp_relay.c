@@ -17,7 +17,7 @@ volatile int display1 = 0;
 ISR (TIMER2_OVF_vect)
 {    
 	PORTB = 0x00; //гасим все разряды
-	DDRC  = (1 << segcounter); //выбираем следующий разряд
+	DDRC  = (1 << segcounter) | (PORTC & (1 << PC3)); //выбираем следующий разряд
 	switch (segcounter)
 	{     
 		case 0:
@@ -64,10 +64,10 @@ unsigned char search_ow_devices(void) // поиск всех устройств на шине
 /***Главная функция***/
 int main (void) 
 {
-	DDRB |= (1 << PD6)|(1 << PD5)|(1 << PD4)|(1 << PD3)|(1 << PD2)|(1 << PD1)|(1 << PD0);
-	DDRC |= (1 << PB3)|(1 << PB2)|(1 << PB1)|(1 << PB0);
+	DDRB |= (1 << PB6)|(1 << PB5)|(1 << PB4)|(1 << PB3)|(1 << PB2)|(1 << PB1)|(1 << PB0);
+	DDRC |= (1 << PC3)|(1 << PC2)|(1 << PC1)|(1 << PC0);
 	PORTB = 0x00;
-	PORTC = 0x00;    
+	//PORTC = 0x00;    
 	
 	DDRD = 0b00000010; PORTD = 0b00000000;
 	
@@ -87,7 +87,7 @@ int main (void)
 	char readResult;
 	unsigned char	themperature[3]; // в этот массив будет записана температура
 	
-	PORTC |= 0b00001000;
+	//PORTC = 0b00001000;
 	
 	while(1)
 	{
@@ -97,6 +97,7 @@ int main (void)
 			
 			switch (owDevicesIDs[i][0])
 			{
+			
 				case OW_DS18B20_FAMILY_CODE: { // если найден термодатчик DS18B20
 					
 					DS18x20_StartMeasureAddressed(owDevicesIDs[i]); // запускаем измерение
@@ -108,12 +109,18 @@ int main (void)
 						DS18x20_ConvertToThemperature(data, themperature); // преобразовываем температуру в человекопонятный вид
 						
 						display1 = themperature[1]*10 + themperature[2]/10;
+						
+						if (display1 < 260){
+							PORTC |= (1 << PC3);
+						}else{
+							PORTC &= ~(1 << PC3);
+						}
 					}
 					
 				} break;
 			}
 		}
-		
+		//display1++;
 		//_delay_ms(1000); // задержка
 	}
 }
