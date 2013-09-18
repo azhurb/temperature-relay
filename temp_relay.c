@@ -110,9 +110,9 @@ int main (void)
 						
 						display1 = themperature[1]*10 + themperature[2]/10;
 						
-						if (display1 < 260){
+						if (display1 < 200){
 							PORTC |= (1 << PC3);
-						}else{
+						}else if (display1 > 220){
 							PORTC &= ~(1 << PC3);
 						}
 					}
