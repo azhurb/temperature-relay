@@ -1,3 +1,3 @@
 # temperature-relay
 
-Socket controlled by temperature sensor.  
+Outlets controlled by a temperature sensor
