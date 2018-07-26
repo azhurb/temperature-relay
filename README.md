@@ -1,4 +1,4 @@
-# temperature-relay
+# Smart outlet
 
 Outlet controlled by a temperature sensor using ATmega8-P
 
