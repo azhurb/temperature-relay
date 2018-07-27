@@ -1,4 +1,4 @@
-/***Использование динамической индикации***/
+/***РСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ РґРёРЅР°РјРёС‡РµСЃРєРѕР№ РёРЅРґРёРєР°С†РёРё***/
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
@@ -13,15 +13,15 @@ char SEGMENT[ ] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F};
 volatile unsigned char segcounter = 0;
 volatile int display1 = 0;
 
-// Обработчик прерывания по переполнению таймера2
+// РћР±СЂР°Р±РѕС‚С‡РёРє РїСЂРµСЂС‹РІР°РЅРёСЏ РїРѕ РїРµСЂРµРїРѕР»РЅРµРЅРёСЋ С‚Р°Р№РјРµСЂР°2
 ISR (TIMER2_OVF_vect)
 {    
-	PORTB = 0x00; //гасим все разряды
-	DDRC  = (1 << segcounter) | (PORTC & (1 << PC3)); //выбираем следующий разряд
+	PORTB = 0x00; //РіР°СЃРёРј РІСЃРµ СЂР°Р·СЂСЏРґС‹
+	DDRC  = (1 << segcounter) | (PORTC & (1 << PC3)); //РІС‹Р±РёСЂР°РµРј СЃР»РµРґСѓСЋС‰РёР№ СЂР°Р·СЂСЏРґ
 	switch (segcounter)
 	{     
 		case 0:
-			PORTB = SEGMENT[display1 % 1000 / 100]; // здесь раскладываем число на разряды
+			PORTB = SEGMENT[display1 % 1000 / 100]; // Р·РґРµСЃСЊ СЂР°СЃРєР»Р°РґС‹РІР°РµРј С‡РёСЃР»Рѕ РЅР° СЂР°Р·СЂСЏРґС‹
 			break;
 		case 1:
 			PORTB = SEGMENT[display1 % 100 / 10] | 0x80;
@@ -33,10 +33,10 @@ ISR (TIMER2_OVF_vect)
 	if ((segcounter++) > 1) segcounter = 0;    
 }
 
-unsigned char	nDevices;	// количество сенсоров
-unsigned char	owDevicesIDs[MAXDEVICES][8];	// Их ID
+unsigned char	nDevices;	// РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРµРЅСЃРѕСЂРѕРІ
+unsigned char	owDevicesIDs[MAXDEVICES][8];	// РС… ID
 
-unsigned char search_ow_devices(void) // поиск всех устройств на шине
+unsigned char search_ow_devices(void) // РїРѕРёСЃРє РІСЃРµС… СѓСЃС‚СЂРѕР№СЃС‚РІ РЅР° С€РёРЅРµ
 { 
 	unsigned char	i;
    	unsigned char	id[OW_ROMCODE_SIZE];
@@ -61,31 +61,27 @@ unsigned char search_ow_devices(void) // поиск всех устройств на шине
 }
 
 
-/***Главная функция***/
+/***Р“Р»Р°РІРЅР°СЏ С„СѓРЅРєС†РёСЏ***/
 int main (void) 
 {
 	DDRB |= (1 << PB6)|(1 << PB5)|(1 << PB4)|(1 << PB3)|(1 << PB2)|(1 << PB1)|(1 << PB0);
 	DDRC |= (1 << PC3)|(1 << PC2)|(1 << PC1)|(1 << PC0);
 	PORTB = 0x00;
-	//PORTC = 0x00;    
-	
+
 	DDRD = 0b00000010; PORTD = 0b00000000;
 	
-	TIMSK |= (1 << TOIE2); // разрешение прерывания по таймеру2
-	TCCR2 |= (1 << CS21); //предделитель на 8 
+	TIMSK |= (1 << TOIE2); // СЂР°Р·СЂРµС€РµРЅРёРµ РїСЂРµСЂС‹РІР°РЅРёСЏ РїРѕ С‚Р°Р№РјРµСЂСѓ2
+	TCCR2 |= (1 << CS21); //РїСЂРµРґРґРµР»РёС‚РµР»СЊ РЅР° 8 
 
-	sei(); //глобально разрешаем прерывания
+	sei(); //РіР»РѕР±Р°Р»СЊРЅРѕ СЂР°Р·СЂРµС€Р°РµРј РїСЂРµСЂС‹РІР°РЅРёСЏ
 	
 	timerDelayInit();
  
-	nDevices = search_ow_devices(); // ищем все устройства
-
-	//display1 = nDevices;
-	//_delay_ms(1000); 
+	nDevices = search_ow_devices(); // РёС‰РµРј РІСЃРµ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 	
-	unsigned char	data[2]; // переменная для хранения старшего и младшего байта данных
+	unsigned char	data[2]; // РїРµСЂРµРјРµРЅРЅР°СЏ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СЃС‚Р°СЂС€РµРіРѕ Рё РјР»Р°РґС€РµРіРѕ Р±Р°Р№С‚Р° РґР°РЅРЅС‹С…
 	char readResult;
-	unsigned char	themperature[3]; // в этот массив будет записана температура
+	unsigned char	themperature[3]; // РІ СЌС‚РѕС‚ РјР°СЃСЃРёРІ Р±СѓРґРµС‚ Р·Р°РїРёСЃР°РЅР° С‚РµРјРїРµСЂР°С‚СѓСЂР°
 	
 	//PORTC = 0b00001000;
 	
@@ -98,15 +94,15 @@ int main (void)
 			switch (owDevicesIDs[i][0])
 			{
 			
-				case OW_DS18B20_FAMILY_CODE: { // если найден термодатчик DS18B20
+				case OW_DS18B20_FAMILY_CODE: { // РµСЃР»Рё РЅР°Р№РґРµРЅ С‚РµСЂРјРѕРґР°С‚С‡РёРє DS18B20
 					
-					DS18x20_StartMeasureAddressed(owDevicesIDs[i]); // запускаем измерение
-					timerDelayMs(800); // ждем минимум 750 мс, пока конвентируется температура
+					DS18x20_StartMeasureAddressed(owDevicesIDs[i]); // Р·Р°РїСѓСЃРєР°РµРј РёР·РјРµСЂРµРЅРёРµ
+					timerDelayMs(800); // Р¶РґРµРј РјРёРЅРёРјСѓРј 750 РјСЃ, РїРѕРєР° РєРѕРЅРІРµРЅС‚РёСЂСѓРµС‚СЃСЏ С‚РµРјРїРµСЂР°С‚СѓСЂР°
 					
 					readResult = DS18x20_ReadData(owDevicesIDs[i], data);
 					
 					if (readResult == 1){
-						DS18x20_ConvertToThemperature(data, themperature); // преобразовываем температуру в человекопонятный вид
+						DS18x20_ConvertToThemperature(data, themperature); // РїСЂРµРѕР±СЂР°Р·РѕРІС‹РІР°РµРј С‚РµРјРїРµСЂР°С‚СѓСЂСѓ РІ С‡РµР»РѕРІРµРєРѕРїРѕРЅСЏС‚РЅС‹Р№ РІРёРґ
 						
 						display1 = themperature[1]*10 + themperature[2]/10;
 						
@@ -120,7 +116,5 @@ int main (void)
 				} break;
 			}
 		}
-		//display1++;
-		//_delay_ms(1000); // задержка
 	}
 }
