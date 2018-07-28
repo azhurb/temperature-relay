@@ -23,15 +23,15 @@ ISR (TIMER2_OVF_vect)
 		case 0:
 			PORTB = SEGMENT[display1 % 1000 / 100]; // здесь раскладываем число на разряды
 			break;
-		case 1:
+			case 1:
 			PORTB = SEGMENT[display1 % 100 / 10] | 0x80;
 			break;    
-		case 2:
+			case 2:
 			PORTB = SEGMENT[display1 % 10];
 			break;
+		}
+		if ((segcounter++) > 1) segcounter = 0;    
 	}
-	if ((segcounter++) > 1) segcounter = 0;    
-}
 
 unsigned char	nDevices;	// количество сенсоров
 unsigned char	owDevicesIDs[MAXDEVICES][8];	// Их ID
@@ -39,24 +39,24 @@ unsigned char	owDevicesIDs[MAXDEVICES][8];	// Их ID
 unsigned char search_ow_devices(void) // поиск всех устройств на шине
 { 
 	unsigned char	i;
-   	unsigned char	id[OW_ROMCODE_SIZE];
-   	unsigned char	diff, sensors_count;
+	unsigned char	id[OW_ROMCODE_SIZE];
+	unsigned char	diff, sensors_count;
 
 	sensors_count = 0;
 
 	for( diff = OW_SEARCH_FIRST; diff != OW_LAST_DEVICE && sensors_count < MAXDEVICES ; )
-    { 
+	{ 
 		OW_FindROM( &diff, &id[0] );
 
-      	if( diff == OW_PRESENCE_ERR ) break;
+		if( diff == OW_PRESENCE_ERR ) break;
 
-      	if( diff == OW_DATA_ERR )	break;
+		if( diff == OW_DATA_ERR )	break;
 
-      	for (i=0;i<OW_ROMCODE_SIZE;i++)
-         	owDevicesIDs[sensors_count][i] = id[i];
-		
+		for (i=0;i<OW_ROMCODE_SIZE;i++)
+			owDevicesIDs[sensors_count][i] = id[i];
+
 		sensors_count++;
-    }
+	}
 	return sensors_count;
 }
 
@@ -69,22 +69,20 @@ int main (void)
 	PORTB = 0x00;
 
 	DDRD = 0b00000010; PORTD = 0b00000000;
-	
+
 	TIMSK |= (1 << TOIE2); // разрешение прерывания по таймеру2
-	TCCR2 |= (1 << CS21); //предделитель на 8 
+	TCCR2 |= (1 << CS21); //предделитель на 8
 
 	sei(); //глобально разрешаем прерывания
-	
+
 	timerDelayInit();
- 
+
 	nDevices = search_ow_devices(); // ищем все устройства
-	
+
 	unsigned char	data[2]; // переменная для хранения старшего и младшего байта данных
 	char readResult;
 	unsigned char	themperature[3]; // в этот массив будет записана температура
-	
-	//PORTC = 0b00001000;
-	
+
 	while(1)
 	{
 		
@@ -93,26 +91,26 @@ int main (void)
 			
 			switch (owDevicesIDs[i][0])
 			{
-			
+
 				case OW_DS18B20_FAMILY_CODE: { // если найден термодатчик DS18B20
-					
+
 					DS18x20_StartMeasureAddressed(owDevicesIDs[i]); // запускаем измерение
 					timerDelayMs(800); // ждем минимум 750 мс, пока конвентируется температура
-					
+
 					readResult = DS18x20_ReadData(owDevicesIDs[i], data);
-					
+
 					if (readResult == 1){
 						DS18x20_ConvertToThemperature(data, themperature); // преобразовываем температуру в человекопонятный вид
-						
+
 						display1 = themperature[1]*10 + themperature[2]/10;
-						
+
 						if (display1 < 200){
 							PORTC |= (1 << PC3);
 						}else if (display1 > 220){
 							PORTC &= ~(1 << PC3);
 						}
 					}
-					
+
 				} break;
 			}
 		}
